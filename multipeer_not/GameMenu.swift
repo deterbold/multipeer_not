@@ -98,17 +98,26 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
         thingToFindLabel.text = ""
         view.addSubview(thingToFindLabel)
         
-        answerLabel = UILabel(frame: CGRect(x: 0, y: self.view.frame.midY + 50, width: self.view.frame.width, height: 40))
+        //https://stackoverflow.com/questions/37893000/swift-infinite-fade-in-and-out-loop
+        
+        answerLabel = UILabel(frame: CGRect(x: 0, y: self.view.frame.midY - 50, width: self.view.frame.width, height: 50))
         answerLabel.font = .boldSystemFont(ofSize: 40)
+        answerLabel.textColor = .black
         answerLabel.textAlignment = .center
+        answerLabel.backgroundColor = UIColor(displayP3Red: 1, green: 1, blue: 1, alpha: 0.6)
         answerLabel.text = ""
         view.addSubview(answerLabel)
+        answerLabel.isHidden = true
         
-        resultsLabel = UILabel(frame: CGRect(x: 0, y: self.view.frame.midY - 50, width: self.view.frame.width, height: 40))
+        resultsLabel = UILabel(frame: CGRect(x: 0, y: self.view.frame.midY + 50, width: self.view.frame.width, height: 50))
         resultsLabel.font = .boldSystemFont(ofSize: 30)
+        resultsLabel.textColor = .black
         resultsLabel.textAlignment = .center
+        resultsLabel.adjustsFontSizeToFitWidth = true
+        resultsLabel.backgroundColor = UIColor(displayP3Red: 1, green: 1, blue: 1, alpha: 0.6)
         resultsLabel.text = ""
         view.addSubview(resultsLabel)
+        resultsLabel.isHidden = true
         
     }
     
@@ -185,6 +194,7 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
     {
         print("game started")
         navigationController?.setToolbarHidden(false, animated: true)
+        thingToFindLabel.isHidden = false
         
         let delimiter = ","
         thingToFind = findThisList.randomElement()
@@ -205,8 +215,10 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
         wonTheGame = false
         
         //clearing the UI
-        self.resultsLabel.text = ""
         self.answerLabel.text = ""
+        self.answerLabel.isHidden = true
+        self.resultsLabel.text = ""
+        self.resultsLabel.isHidden = true
         outletView.image = nil
     }
     
@@ -254,8 +266,8 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
         {
             print(selectedImage)
             self.outletView.image = selectedImage
-//            guard let transformedImage = CIImage(image: selectedImage) else { return }
-//            artificialIntelligence(image: transformedImage)
+            guard let transformedImage = CIImage(image: selectedImage) else { return }
+            artificialIntelligence(image: transformedImage)
         }
         print(selectedImagefromPicker!.size)
         
@@ -267,6 +279,16 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
     
     func artificialIntelligence(image: CIImage)
     {
+        thingToFindLabel.text = ""
+        thingToFindLabel.isHidden = true
+        answerLabel.isHidden = false
+        resultsLabel.isHidden = false
+        
+        answerLabel.frame.size.width = self.outletView.frame.width
+        answerLabel.frame.origin.x = self.outletView.frame.origin.x
+        resultsLabel.frame.size.width = self.outletView.frame.width
+        resultsLabel.frame.origin.x = self.outletView.frame.origin.x
+        
         answerLabel.text = "Detecting image..."
 
         // Load the ML model through its generated class
