@@ -30,6 +30,19 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
     var camera: UIBarButtonItem!
     var reset: UIBarButtonItem!
     var library: UIBarButtonItem!
+    //outletView
+    var outletView: UIImageView!
+    //labels
+    var thingToFindLabel: UILabel!
+    var answerLabel: UILabel!
+    var resultsLabel: UILabel!
+    
+    //MARK: - GAME VARIABLES
+    var resultsArray = [String]()
+    var thingToFind: String!
+    var wonTheGame = false
+    
+    let findThisList = ["acoustic guitar", "backpack, back pack, knapsack, packsack, rucksack, haversack", "balloon", "can opener, tin opener", "cellular telephone, cellular phone, cellphone, cell, mobile phone", "computer keyboard, keypad", "desktop computer", "digital clock", "digital watch", "dining table, board", "electric guitar", "frying pan, frypan, skillet", "guillotine", "hammer", "jean, blue jean, denim", "laptop, laptop computer", "loudspeaker, speaker, speaker unit, loudspeaker system, speaker system", "mask","minivan", "nipple", "padlock", "park bench", "parking meter", "pillow", "screwdriver", "ski mask", "television, television system", "tennis ball", "typewriter keyboard", "vacuum, vacuum cleaner", "toilet seat", "wallet, billfold, notecase, pocketbook", "water bottle", "street sign", "pretzel", "cheeseburger", "hotdog, hot dog, red hot", "strawberry", "orange", "lemon", "fig", "pineapple, ananas", "banana", "pizza, pizza pie","volcano","toilet tissue, toilet paper, bathroom tissue", "cup","broccoli"]
     
     override func viewDidLoad()
     {
@@ -63,6 +76,39 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
         library = UIBarButtonItem(title: "LIBRARY", style: .plain, target: self, action: #selector(openPhotoLibrary))
         let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         toolbarItems = [spacer, library, spacer, spacer, camera, spacer, spacer, reset, spacer]
+        
+        //MARK: - OUTLET VIEW INIT
+        outletView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height * 0.8))
+        outletView.contentMode = .scaleAspectFill
+        view.addSubview(outletView)
+
+        outletView.translatesAutoresizingMaskIntoConstraints = false
+        outletView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        outletView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+//        outletView.heightAnchor.constraint(equalTo: view.layoutMarginsGuide.heightAnchor).isActive = true
+//        outletView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
+        outletView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
+        outletView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        outletView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        
+        //MARK: - LABELS
+        thingToFindLabel = UILabel(frame: CGRect(x: 0, y: self.view.frame.midY, width: self.view.frame.width, height: 40))
+        thingToFindLabel.font = .boldSystemFont(ofSize: 20)
+        thingToFindLabel.textAlignment = .center
+        thingToFindLabel.text = ""
+        view.addSubview(thingToFindLabel)
+        
+        answerLabel = UILabel(frame: CGRect(x: 0, y: self.view.frame.midY + 50, width: self.view.frame.width, height: 40))
+        answerLabel.font = .boldSystemFont(ofSize: 40)
+        answerLabel.textAlignment = .center
+        answerLabel.text = ""
+        view.addSubview(answerLabel)
+        
+        resultsLabel = UILabel(frame: CGRect(x: 0, y: self.view.frame.midY - 50, width: self.view.frame.width, height: 40))
+        resultsLabel.font = .boldSystemFont(ofSize: 30)
+        resultsLabel.textAlignment = .center
+        resultsLabel.text = ""
+        view.addSubview(resultsLabel)
         
     }
     
@@ -139,6 +185,29 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
     {
         print("game started")
         navigationController?.setToolbarHidden(false, animated: true)
+        
+        let delimiter = ","
+        thingToFind = findThisList.randomElement()
+        let thingToFindCut = thingToFind.components(separatedBy: delimiter)
+        
+        if thingToFindCut[0].startsWithVowel
+        {
+            self.thingToFindLabel.text = "Find me an \(thingToFindCut[0])"
+        }
+        else
+        {
+            self.thingToFindLabel.text = "Find me a \(thingToFindCut[0])"
+        }
+        
+        thingToFind = thingToFindCut[0]
+        
+        //restarting the game
+        wonTheGame = false
+        
+        //clearing the UI
+        self.resultsLabel.text = ""
+        self.answerLabel.text = ""
+        outletView.image = nil
     }
     
     @objc func takePicture()
@@ -164,14 +233,12 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
     
     @objc func resetGame()
     {
-        
+        startGame()
     }
     
     //MARK: - IMAGE PICKER CONTROLLER
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any])
     {
-        
-        
         var selectedImagefromPicker: UIImage?
        
         if let editedImage = info[.editedImage] as? UIImage
@@ -186,12 +253,120 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
         if let selectedImage = selectedImagefromPicker
         {
             print(selectedImage)
-//            outletView.image = selectedImage
+            self.outletView.image = selectedImage
 //            guard let transformedImage = CIImage(image: selectedImage) else { return }
 //            artificialIntelligence(image: transformedImage)
         }
         print(selectedImagefromPicker!.size)
         
         dismiss(animated: true, completion: nil)
+    }
+    
+    
+    //MARK: - ARTIFICIAL INTELLIGENCE, BABY!
+    
+    func artificialIntelligence(image: CIImage)
+    {
+        answerLabel.text = "Detecting image..."
+
+        // Load the ML model through its generated class
+        guard let model = try? VNCoreMLModel(for: Resnet50().model) else
+        {
+            fatalError("Can't load Inception ML model")
+        }
+
+        // Create a Vision request with completion handler
+        let request = VNCoreMLRequest(model: model)
+        { [weak self] request, error in
+
+         guard let results = request.results as? [VNClassificationObservation],
+             
+             
+             let firstResult = results.first else { fatalError("unexpected result type") }
+             let secondResult = results[1] as? VNClassificationObservation
+         let thirdResult = results[2] as? VNClassificationObservation
+         let fourthResult = results[3] as? VNClassificationObservation
+         
+         let firstResultID: String = firstResult.identifier
+         let secondResultID: String = secondResult?.identifier ?? "The results was not good"
+         let thirdResultID: String = thirdResult?.identifier ?? "The result was not good"
+         let fourthResultID: String = fourthResult?.identifier ?? "the result was not good"
+         
+
+         DispatchQueue.main.async
+         {
+             [weak self] in
+             
+             let ttf = self?.thingToFind!
+             
+             let limit = ","
+             let firstResultIDCut = firstResultID.components(separatedBy: limit)
+             let firstResultFInal = firstResultIDCut[0]
+             print(firstResultFInal)
+             let secondResultIDCut = secondResultID.components(separatedBy: limit)
+             let secondResultFInal = secondResultIDCut[0]
+             print(secondResultFInal)
+             let thirdResultIDCut = thirdResultID.components(separatedBy: limit)
+             let thirdResultFInal = thirdResultIDCut[0]
+             print(thirdResultFInal)
+             let fourthResultIDCut = fourthResultID.components(separatedBy: limit)
+             let fourthResultFInal = fourthResultIDCut[0]
+             print(fourthResultFInal)
+             
+             if firstResultFInal == ttf
+             {
+                 print("too right guess")
+                 
+                 if firstResultFInal.startsWithVowel
+                 {
+                     print("vowel")
+                     self?.answerLabel.text = "That is actually an \(ttf!)"
+                     self?.resultsLabel.text = "Try finding something that is not, but could probably be an \(ttf!)"
+                 }
+                 else
+                 {
+                     print("consonant")
+                     self?.answerLabel.text = "That is actually a \(ttf!)"
+                     self?.resultsLabel.text = "Try finding something that is not, but could probably be a \(ttf!)"
+                 }
+             }
+             
+             if secondResultFInal == ttf || thirdResultFInal == ttf || fourthResultFInal == ttf
+             {
+                 print("right guess guess")
+                 self?.answerLabel.text = "CONGRATS! That is not a \(ttf!), but it could be"
+                 self?.resultsLabel.text = "The computer sees: \(firstResultFInal), \(secondResultFInal), \(thirdResultFInal), \(fourthResultFInal) "
+                 
+             }
+             else
+             {
+                 print("totally wrong guess")
+                 
+                 if firstResultFInal.startsWithVowel
+                 {
+                     print("vowel")
+                     self?.answerLabel.text = "That is actually an \(firstResultFInal)"
+                     self?.resultsLabel.text = "The computer sees: \(firstResultFInal), \(secondResultFInal), \(thirdResultFInal), \(fourthResultFInal) "
+                 }
+                 else
+                 {
+                     print("consonant")
+                     self?.answerLabel.text = "That is actually a \(firstResultFInal)"
+                     self?.resultsLabel.text = "The computer sees: \(firstResultFInal), \(secondResultFInal), \(thirdResultFInal), \(fourthResultFInal) "
+                 }
+                 
+             }
+         }
+        }
+
+        // Run the Core ML model classifier on global dispatch queue
+        let handler = VNImageRequestHandler(ciImage: image)
+        DispatchQueue.global(qos: .userInteractive).async {
+            do {
+                try handler.perform([request])
+            } catch {
+                print(error)
+            }
+        }
     }
 }

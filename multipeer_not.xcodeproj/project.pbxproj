@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		493D34B723D88E4F00B80B13 /* StartsWIthVowel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 493D34B623D88E4F00B80B13 /* StartsWIthVowel.swift */; };
+		493D34BA23D88E9400B80B13 /* CharacterExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 493D34B923D88E9400B80B13 /* CharacterExtension.swift */; };
+		493D34BC23D89C4200B80B13 /* Resnet50.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 493D34BB23D89C4200B80B13 /* Resnet50.mlmodel */; };
 		49EE5C2823D5DA3000514DE8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49EE5C2723D5DA3000514DE8 /* AppDelegate.swift */; };
 		49EE5C2F23D5DA3000514DE8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 49EE5C2D23D5DA3000514DE8 /* Main.storyboard */; };
 		49EE5C3123D5DA3300514DE8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 49EE5C3023D5DA3300514DE8 /* Assets.xcassets */; };
@@ -15,6 +18,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		493D34B623D88E4F00B80B13 /* StartsWIthVowel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartsWIthVowel.swift; sourceTree = "<group>"; };
+		493D34B923D88E9400B80B13 /* CharacterExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterExtension.swift; sourceTree = "<group>"; };
+		493D34BB23D89C4200B80B13 /* Resnet50.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Resnet50.mlmodel; sourceTree = "<group>"; };
 		49EE5C2423D5DA3000514DE8 /* multipeer_not.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = multipeer_not.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49EE5C2723D5DA3000514DE8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		49EE5C2E23D5DA3000514DE8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -35,6 +41,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		493D34B823D88E8100B80B13 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				493D34B623D88E4F00B80B13 /* StartsWIthVowel.swift */,
+				493D34B923D88E9400B80B13 /* CharacterExtension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		49EE5C1B23D5DA3000514DE8 = {
 			isa = PBXGroup;
 			children = (
@@ -54,6 +69,8 @@
 		49EE5C2623D5DA3000514DE8 /* multipeer_not */ = {
 			isa = PBXGroup;
 			children = (
+				493D34BB23D89C4200B80B13 /* Resnet50.mlmodel */,
+				493D34B823D88E8100B80B13 /* Extensions */,
 				49EE5C2723D5DA3000514DE8 /* AppDelegate.swift */,
 				49EE5C3B23D5DA7C00514DE8 /* GameMenu.swift */,
 				49EE5C2D23D5DA3000514DE8 /* Main.storyboard */,
@@ -135,6 +152,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				493D34BC23D89C4200B80B13 /* Resnet50.mlmodel in Sources */,
+				493D34B723D88E4F00B80B13 /* StartsWIthVowel.swift in Sources */,
+				493D34BA23D88E9400B80B13 /* CharacterExtension.swift in Sources */,
 				49EE5C3C23D5DA7C00514DE8 /* GameMenu.swift in Sources */,
 				49EE5C2823D5DA3000514DE8 /* AppDelegate.swift in Sources */,
 			);
