@@ -15,6 +15,12 @@ import CoreML
 import Vision
 import AVFoundation
 
+public struct LabelTexts: Codable
+{
+    var answerTxt: String
+    var resultsTxt: String
+}
+
 class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate
 {
     //MARK: - MULTIPEER UI VARIABLES
@@ -85,8 +91,6 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
         outletView.translatesAutoresizingMaskIntoConstraints = false
         outletView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
         outletView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
-//        outletView.heightAnchor.constraint(equalTo: view.layoutMarginsGuide.heightAnchor).isActive = true
-//        outletView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
         outletView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
         outletView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         outletView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
@@ -183,8 +187,70 @@ class GameMenu: UIViewController, MCSessionDelegate, MCBrowserViewControllerDele
         }
     }
     
-    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID)
+    {
+        if let image = UIImage(data: data)
+        {
+            DispatchQueue.main.async { [unowned self] in
+                self.outletView.image = image
+            }
+        }
+    //https://stackoverflow.com/questions/52838432/why-are-strings-sent-via-multipeer-connectivity-garbled-on-the-receiving-end
         
+        let receivedData = data
+        let decoder = JSONDecoder()
+        let attepmt = try? decoder.decode(LabelTexts.self, from: receivedData)
+        print(attepmt!.answerTxt)
+        print(attepmt!.resultsTxt)
+        
+        DispatchQueue.main.async {
+            self.answerLabel.text = attepmt!.answerTxt
+            self.resultsLabel.text = attepmt!.resultsTxt
+        }
+        
+    }
+    
+    //MARK: - SENDING DATA
+    func sendImage(img: UIImage)
+    {
+        if mcSession.connectedPeers.count > 0
+        {
+            if let imageData = img.pngData()
+            {
+                do
+                {
+                    try mcSession.send(imageData, toPeers: mcSession.connectedPeers, with: .reliable)
+                } catch let error as NSError
+                {
+                    let ac = UIAlertController(title: "ERROR sending image", message: error.localizedDescription, preferredStyle: .alert)
+                    ac.addAction(UIAlertAction(title: "OK", style: .default))
+                    present(ac, animated: true)
+                }
+            }
+        }
+    }
+    
+    func sendString(str1: String, str2: String)
+    {
+        let labels = LabelTexts(answerTxt: str1, resultsTxt: str2)
+        let encoder = JSONEncoder()
+        let encodedLabels = (try? encoder.encode(labels))!
+        if mcSession.connectedPeers.count > 0
+        {
+            let stringToSend = String(data: encodedLabels, encoding: .utf8)
+            if let stringData = stringToSend?.data(using: .utf8)
+            {
+                do
+                {
+                    try mcSession.send(stringData, toPeers: mcSession.connectedPeers, with: .reliable)
+                } catch let error as NSError
+                {
+                    let ac = UIAlertController(title: "ERROR sending text", message: error.localizedDescription, preferredStyle: .alert)
+                    ac.addAction(UIAlertAction(title: "OK", style: .default))
+                    present(ac, animated: true)
+                }
+            }
+        }
     }
     
     
